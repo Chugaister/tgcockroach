@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "tgcockroach"
+version = "0.1.0"
+description = "Telegram group chat scanner"
+authors = ["Chugaister <dmytroshvahyliak@gmail.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.112.0"
+SQLAlchemy = "^2.0.32"
+asyncpg = "^0.29.0"
+pydantic = "^2.8.2"
+starlette = "^0.37.2"
+uvicorn = "^0.30.5"
+python-dotenv = "^1.0.1"
+alembic = "^1.13.2"
+pyjwt = "^2.9.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
