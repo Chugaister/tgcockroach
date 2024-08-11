@@ -12,6 +12,7 @@ class BaseRepository(Generic[ModelType]):
 
     def __init__(self, model: Type[ModelType]):
         self.model_class: Type[ModelType] = model
+        self.primary_key_column: str = self._get_primary_key_column_name(self.model_class)
 
     async def create(self, session: AsyncSession, attributes: dict[str, Any] = None) -> ModelType:
         if attributes is None:
@@ -40,6 +41,15 @@ class BaseRepository(Generic[ModelType]):
             return await self.one(session, query)
         else:
             return await self.all(session, query)
+
+    async def get_by_id(
+            self,
+            session: AsyncSession,
+            value: Any
+    ) -> ModelType:
+        query = self.query()
+        query = await self._get_by(query, self.primary_key_column, value)
+        return await self.one(session, query)
 
     async def delete(self, session: AsyncSession, model: ModelType) -> None:
         await session.delete(model)
@@ -72,3 +82,14 @@ class BaseRepository(Generic[ModelType]):
                 for order in order_["desc"]:
                     query = query.order_by(getattr(self.model_class, order).desc())
         return query
+
+    def _get_primary_key_column_name(
+            self,
+            model_class: Type[ModelType],
+    ) -> Optional[str]:
+        primary_key_columns = model_class.__table__.primary_key.columns
+        if len(primary_key_columns) == 1:
+            return list(primary_key_columns)[0].name
+        elif len(primary_key_columns) > 1:
+            return [col.name for col in primary_key_columns]
+        raise RuntimeError(f"Cannot find primary key column {primary_key_columns}")
